@@ -1,0 +1,28 @@
+<!-- logo-anim-b.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="StudySync">
+  <defs>
+    <linearGradient id="gB" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#06b6d4"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- square background -->
+  <rect width="120" height="120" rx="18" fill="url(#gB)"/>
+
+  <!-- circular ring -->
+  <g transform="translate(60,42)">
+    <g id="arrows" transform="rotate(0)">
+      <path d="M-24,-2 L-6,-2 L-6,-10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M24,2 L6,2 L6,10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <!-- rotate the arrows group -->
+    <animateTransform xlink:href="#arrows" attributeName="transform" attributeType="XML"
+      type="rotate" from="0 0 0" to="360 0 0" dur="3.6s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- text below in center -->
+  <text x="60" y="96" font-family="Inter, Arial" font-size="18" font-weight="700" fill="#fff" text-anchor="middle">Study</text>
+  <text x="60" y="110" font-family="Inter, Arial" font-size="12" font-weight="500" fill="#ddf9ff" text-anchor="middle">Sync</text>
+</svg>
