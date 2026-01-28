@@ -1,6 +1,6 @@
-# 📚 StudySync — Notes, Todos & AI Summaries
+# 📚 StudySync  (Notes, Todos & AI Summaries)
 
-StudySync is a **full-stack productivity web application** built using the **MERN stack** that helps users manage notes, todos, and generate AI-powered summaries — all in one clean and modern workspace.
+StudySync is a **full-stack productivity web application** built using the **MERN stack** that helps users manage notes, todos, and generate AI-powered summaries all in one clean and modern workspace.
 
 ---
 
