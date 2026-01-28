@@ -90,7 +90,7 @@ Backend setup
 cd backend
 npm install
 
-Create a .env file in backend/:
+2️⃣ Create a .env file in backend/:
 
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
@@ -106,11 +106,8 @@ npm run dev
 🔒 Environment Variables
 
 Make sure these are never pushed to GitHub:
-
 MONGO_URI
-
 JWT_SECRET
-
 Handled via .gitignore.
 
 🧪 Status
@@ -122,6 +119,6 @@ Handled via .gitignore.
 
 👤 Author
 Amit Gupta
-Full-Stack Developer (MERN)
+Full-Stack Developer (MERN) 
 Email: guptaamit0456@gmail.com
 LinkedIn: https://www.linkedin.com/in/amit-gupta-8104s/ 
