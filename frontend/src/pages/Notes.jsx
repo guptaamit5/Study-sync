@@ -32,7 +32,7 @@ export default function Notes() {
 
   const fetchNotes = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/notes", {
+      const res = await fetch("https://study-sync-2hsw.onrender.com/api/notes", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -49,7 +49,7 @@ export default function Notes() {
     if (!title.trim() || !content.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/notes", {
+      const res = await fetch("https://study-sync-2hsw.onrender.com/api/notes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function Notes() {
   // ==============================
   const deleteNote = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/notes/${id}`, {
+      await fetch(`https://study-sync-2hsw.onrender.com/api/notes/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -91,7 +91,7 @@ export default function Notes() {
   const updateNote = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/notes/${activeNote._id}`,
+        `https://study-sync-2hsw.onrender.com/api/notes/${activeNote._id}`,
         {
           method: "PUT",
           headers: {

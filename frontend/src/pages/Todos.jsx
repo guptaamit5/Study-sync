@@ -21,7 +21,7 @@ const completedTodos = todos.filter(todo => todo.completed);
 
   const fetchTodos = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/todos", {
+      const res = await fetch("https://study-sync-2hsw.onrender.com/api/todos", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -35,7 +35,7 @@ const completedTodos = todos.filter(todo => todo.completed);
     if (!task.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/todos", {
+      const res = await fetch("https://study-sync-2hsw.onrender.com/api/todos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ const completedTodos = todos.filter(todo => todo.completed);
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/todos/${id}`,
+        `https://study-sync-2hsw.onrender.com/api/todos/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +81,7 @@ const completedTodos = todos.filter(todo => todo.completed);
   const toggleComplete = async (id) => {
   try {
     const res = await fetch(
-      `http://localhost:5000/api/todos/${id}/toggle`,
+      `https://study-sync-2hsw.onrender.com/api/todos/${id}/toggle`,
       {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },

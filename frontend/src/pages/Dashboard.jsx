@@ -55,7 +55,7 @@ const Dashboard = () => {
 
     const loadStats = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/dashboard/stats", {
+        const res = await fetch("https://study-sync-2hsw.onrender.com/api/dashboard/stats", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

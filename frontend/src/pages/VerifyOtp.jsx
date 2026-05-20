@@ -18,7 +18,7 @@ export default function VerifyOtp() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch("https://study-sync-2hsw.onrender.com/api/auth/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

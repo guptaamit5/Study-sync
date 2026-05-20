@@ -13,7 +13,7 @@ export default function Summary() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/notes", {
+    fetch("https://study-sync-2hsw.onrender.com/api/notes", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -27,7 +27,7 @@ const generateSummary = async () => {
   setShowModal(true);
   setSummary("Generating summary...");
 
-  const res = await fetch("http://localhost:5000/api/summary", {
+  const res = await fetch("https://study-sync-2hsw.onrender.com/api/summary", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

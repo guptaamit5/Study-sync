@@ -22,7 +22,7 @@ export default function Register() {
     try {
       setLoading(true);
 
-     const res = await fetch("http://localhost:5000/api/auth/register", {
+     const res = await fetch("https://study-sync-2hsw.onrender.com/api/auth/register", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ name, email, password }),
@@ -91,7 +91,7 @@ navigate("/verify-otp", { state: { email } });
   <GoogleLogin
     onSuccess={async (credentialResponse) => {
       const res = await fetch(
-        "http://localhost:5000/api/auth/google-login",
+        "https://study-sync-2hsw.onrender.com/api/auth/google-login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

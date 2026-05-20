@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://study-sync-2hsw.onrender.com/api";
 
 export const apiFetch = async (endpoint, options = {}) => {
   const token = localStorage.getItem("token");
