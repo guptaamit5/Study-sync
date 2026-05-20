@@ -12,17 +12,21 @@ export default function Notes() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  // 🔥 Read / Edit modal states
   const [activeNote, setActiveNote] = useState(null);
-  const [mode, setMode] = useState("read"); // read | edit
+  const [mode, setMode] = useState("read");
 
-  // 🔥 LOAD NOTES
+  // ✅ DELETE MODAL STATE
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  // ==============================
+  // LOAD NOTES
+  // ==============================
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
-
     fetchNotes();
   }, [token]);
 
@@ -38,7 +42,9 @@ export default function Notes() {
     }
   };
 
-  // 🔥 CREATE NOTE
+  // ==============================
+  // CREATE NOTE
+  // ==============================
   const saveNote = async () => {
     if (!title.trim() || !content.trim()) return;
 
@@ -63,23 +69,25 @@ export default function Notes() {
     }
   };
 
-  // 🔥 DELETE NOTE (DB is truth)
+  // ==============================
+  // DELETE NOTE (NO confirm here)
+  // ==============================
   const deleteNote = async (id) => {
-    if (!window.confirm("Delete this note?")) return;
-
     try {
       await fetch(`http://localhost:5000/api/notes/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      fetchNotes(); // reload from DB
+      fetchNotes();
     } catch {
       alert("Delete failed");
     }
   };
 
-  // 🔥 UPDATE NOTE
+  // ==============================
+  // UPDATE NOTE
+  // ==============================
   const updateNote = async () => {
     try {
       const res = await fetch(
@@ -106,22 +114,44 @@ export default function Notes() {
     }
   };
 
+  // ==============================
+  // DOWNLOAD NOTE
+  // ==============================
+  const downloadNote = (note) => {
+    const blob = new Blob([note.content], {
+      type: "text/plain;charset=utf-8",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    const safeTitle = note.title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+
+    a.href = url;
+    a.download = `${safeTitle || "note"}.txt`;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="workspace">
       <button className="secondary-btn" onClick={() => navigate("/dashboard")}>
         ← Back to Dashboard
       </button>
-      <div className="page-divider" />
 
       <div className="workspace-header">
         <h1>My Notes</h1>
-        <button className="primary-btn" onClick={() => setShowModal(true)}>
+
+        <button
+          className="primary-btn"
+          onClick={() => setShowModal(true)}
+        >
           + New Note
         </button>
-        
       </div>
 
-      {/* 🔥 CREATE MODAL */}
+      {/* CREATE MODAL */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-box">
@@ -140,32 +170,61 @@ export default function Notes() {
             />
 
             <div className="modal-actions">
-              <button className="secondary-btn" onClick={() => setShowModal(false)}>
+              <button onClick={() => setShowModal(false)}>Cancel</button>
+              <button onClick={saveNote}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE MODAL */}
+      {deleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h2>Delete Note</h2>
+            <p>Are you sure you want to delete this note?</p>
+
+            <div className="modal-actions">
+              <button
+                onClick={() => {
+                  setDeleteModal(false);
+                  setDeleteId(null);
+                }}
+              >
                 Cancel
               </button>
-              <button className="primary-btn" onClick={saveNote}>
-                Save
+
+              <button
+                className="delete-btn"
+                onClick={() => {
+                  deleteNote(deleteId);
+                  setDeleteModal(false);
+                  setDeleteId(null);
+                }}
+              >
+                Delete
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 🔥 NOTES GRID */}
+      {/* NOTES GRID */}
       <div className="card-grid">
         {notes.map(note => (
           <div className="card" key={note._id}>
             <h3>{note.title}</h3>
 
-            <p className="note-preview">
+            <p>
               {note.content.length > 120
                 ? note.content.slice(0, 120) + "..."
                 : note.content}
             </p>
 
             <div className="card-actions">
+              <button onClick={() => downloadNote(note)}>Download</button>
+
               <button
-                className="secondary-btn"
                 onClick={() => {
                   setActiveNote(note);
                   setMode("read");
@@ -175,7 +234,6 @@ export default function Notes() {
               </button>
 
               <button
-                className="secondary-btn"
                 onClick={() => {
                   setActiveNote(note);
                   setMode("edit");
@@ -184,9 +242,12 @@ export default function Notes() {
                 Edit
               </button>
 
+              {/* ✅ FIXED DELETE BUTTON */}
               <button
-                className="secondary-btn"
-                onClick={() => deleteNote(note._id)}
+                onClick={() => {
+                  setDeleteId(note._id);
+                  setDeleteModal(true);
+                }}
               >
                 Delete
               </button>
@@ -195,10 +256,10 @@ export default function Notes() {
         ))}
       </div>
 
-      {/* 🔥 READ / EDIT MODAL */}
+      {/* READ / EDIT MODAL */}
       {activeNote && (
         <div className="modal-overlay">
-          <div className="modal-box large">
+          <div className="modal-box">
             <h2>{mode === "read" ? "View Note" : "Edit Note"}</h2>
 
             <input
@@ -215,21 +276,13 @@ export default function Notes() {
               onChange={e =>
                 setActiveNote({ ...activeNote, content: e.target.value })
               }
-              style={{ minHeight: "220px" }}
             />
 
             <div className="modal-actions">
-              <button
-                className="secondary-btn"
-                onClick={() => setActiveNote(null)}
-              >
-                Close
-              </button>
+              <button onClick={() => setActiveNote(null)}>Close</button>
 
               {mode === "edit" && (
-                <button className="primary-btn" onClick={updateNote}>
-                  Save Changes
-                </button>
+                <button onClick={updateNote}>Save</button>
               )}
             </div>
           </div>
@@ -238,5 +291,3 @@ export default function Notes() {
     </div>
   );
 }
-
-

@@ -8,6 +8,8 @@ export default function Todos() {
 
   const [todos, setTodos] = useState([]);
   const [task, setTask] = useState("");
+  const activeTodos = todos.filter(todo => !todo.completed);
+const completedTodos = todos.filter(todo => todo.completed);
 
   useEffect(() => {
     if (!token) {
@@ -76,6 +78,24 @@ export default function Todos() {
     }
   };
 
+  const toggleComplete = async (id) => {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/todos/${id}/toggle`,
+      {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (!res.ok) throw new Error();
+
+    fetchTodos(); // refresh list
+  } catch {
+    alert("Failed to update task");
+  }
+}; 
+
   return (
     <div className="workspace">
       <button className="secondary-btn" onClick={() => navigate("/dashboard")}>
@@ -99,10 +119,56 @@ export default function Todos() {
 
       <div className="todo-divider" />
 
-      <div className="card-grid">
-        {todos.map(todo => (
-          <div className="card todo-card" key={todo._id}>
-            <h3>{todo.title}</h3>
+      {/* ACTIVE SECTION */}
+<h2 style={{ marginBottom: "15px" }}>Active Tasks</h2>
+
+<div className="card-grid">
+  {activeTodos.map(todo => (
+    <div className="card todo-card" key={todo._id}>
+      <h3>{todo.title}</h3>
+
+      <div style={{ display: "flex", gap: "10px" }}>
+        <button
+          className="primary-btn"
+          onClick={() => toggleComplete(todo._id)}
+        >
+          Complete
+        </button>
+
+        <button
+          className="secondary-btn"
+          onClick={() => deleteTodo(todo._id)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
+{/* COMPLETED SECTION */}
+{completedTodos.length > 0 && (
+  <>
+    <h2 style={{ margin: "30px 0 15px" }}>Completed</h2>
+
+    <div className="card-grid">
+      {completedTodos.map(todo => (
+        <div
+          className="card todo-card"
+          key={todo._id}
+          style={{ opacity: 0.6 }}
+        >
+          <h3 style={{ textDecoration: "line-through" }}>
+            {todo.title}
+          </h3>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              className="secondary-btn"
+              onClick={() => toggleComplete(todo._id)}
+            >
+              Undo
+            </button>
 
             <button
               className="secondary-btn"
@@ -111,10 +177,11 @@ export default function Todos() {
               Delete
             </button>
           </div>
-        ))}
-
-        {todos.length === 0 && <p>No tasks yet.</p>}
-      </div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
     </div>
   );
 }

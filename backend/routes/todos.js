@@ -55,4 +55,25 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
+// TOGGLE COMPLETE
+router.patch("/:id/toggle", auth, async (req, res) => {
+  try {
+    const todo = await Todo.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!todo) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    todo.completed = !todo.completed;
+    await todo.save();
+
+    res.json(todo);
+  } catch {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

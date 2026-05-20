@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import "./Login.css"; // same design as login
 
 export default function Register() {
@@ -11,7 +12,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
-    e.preventDefault(); // 🔥 MUST
+    e.preventDefault(); 
 
     if (!name || !email || !password) {
       alert("All fields required");
@@ -21,15 +22,27 @@ export default function Register() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+     const res = await fetch("http://localhost:5000/api/auth/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ name, email, password }),
+});
 
-      const data = await res.json();
+let data;
+
+try {
+  data = await res.json();
+} catch {
+  alert("Server error. Check backend.");
+  return;
+}
+
+if (!res.ok) {
+  alert(data.msg || "Registration failed");
+  return;
+}
+
+navigate("/verify-otp", { state: { email } });
 
       if (!res.ok) {
         alert(data.msg || "Registration failed");
@@ -47,6 +60,9 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+ 
+
 
   return (
     <div className="login-page">
@@ -70,6 +86,33 @@ export default function Register() {
         <button type="submit" disabled={loading}>
           {loading ? "Creating..." : "Register"}
         </button>
+
+         <div style={{ marginTop: "20px", display: "flex", justifyContent: "center" }}>
+  <GoogleLogin
+    onSuccess={async (credentialResponse) => {
+      const res = await fetch(
+        "http://localhost:5000/api/auth/google-login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: credentialResponse.credential,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+if (data.requiresOtp) {
+  navigate("/verify-otp", { state: { email: data.email } });
+} else {
+  localStorage.setItem("token", data.token);
+  navigate("/dashboard");
+}
+    }}
+    onError={() => alert("Google Register Failed")}
+  />
+  </div>
 
         <div className="login-footer">
           Already have an account? <Link to="/login">Sign in</Link>

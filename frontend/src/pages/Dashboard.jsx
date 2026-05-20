@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    user = null;
+  }
 
   const [stats, setStats] = useState({
     notes: 0,
@@ -12,7 +18,34 @@ const Dashboard = () => {
     summaries: 0,
   });
 
-  const [open, setOpen] = useState(false); // 🔹 dropdown state
+  function AnimatedCounter({ value, duration = 600 }) {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      let startTimestamp = null;
+
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = timestamp - startTimestamp;
+
+        const progressRatio = Math.min(progress / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progressRatio, 3);
+
+        const currentValue = Math.floor(easeOut * value);
+        setCount(currentValue);
+
+        if (progress < duration) {
+          requestAnimationFrame(step);
+        }
+      };
+
+      requestAnimationFrame(step);
+    }, [value, duration]);
+
+    return <span>{count}</span>;
+  }
+
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -20,20 +53,40 @@ const Dashboard = () => {
       return;
     }
 
-    fetch("http://localhost:5000/api/dashboard/stats", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        setStats({
-          notes: data.notes,
-          todos: data.todos,
-          summaries: data.summariesToday, // daily reset
+    const loadStats = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/dashboard/stats", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-      })
-      .catch(err => console.error(err));
+
+        
+        if (!res.ok) {
+          console.error("Stats API failed:", res.status);
+          return;
+        }
+
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          console.error("Invalid JSON response");
+          return;
+        }
+
+        setStats({
+          notes: data?.notes || 0,
+          todos: data?.todos || 0,
+          summaries: data?.summariesToday || 0,
+        });
+
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      }
+    };
+
+    loadStats();
   }, [token, navigate]);
 
   const logout = () => {
@@ -43,11 +96,9 @@ const Dashboard = () => {
 
   return (
     <div style={styles.page}>
-      {/* Navbar */}
       <div style={styles.navbar}>
         <h1 style={styles.logo}>StudySync</h1>
 
-        {/* 🔹 USER + DROPDOWN */}
         <div style={styles.userBox}>
           <div
             style={styles.userTrigger}
@@ -67,7 +118,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Header */}
       <div style={styles.header}>
         <h2 style={styles.title}>Dashboard Overview</h2>
         <p style={styles.subtitle}>
@@ -75,12 +125,11 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Cards */}
       <div style={styles.grid}>
         <div style={styles.card}>
           <h3>📘 Notes</h3>
           <p>Total notes created</p>
-          <h1>{stats.notes}</h1>
+          <h1><AnimatedCounter value={stats.notes} /></h1>
           <button style={styles.button} onClick={() => navigate("/notes")}>
             Open Notes
           </button>
@@ -89,7 +138,7 @@ const Dashboard = () => {
         <div style={styles.card}>
           <h3>✅ Pending Todos</h3>
           <p>Tasks remaining</p>
-          <h1>{stats.todos}</h1>
+          <h1><AnimatedCounter value={stats.todos} /></h1>
           <button style={styles.button} onClick={() => navigate("/todos")}>
             View Todos
           </button>
@@ -98,7 +147,7 @@ const Dashboard = () => {
         <div style={styles.card}>
           <h3>🤖 AI Summaries</h3>
           <p>Generated today</p>
-          <h1>{stats.summaries}</h1>
+          <h1><AnimatedCounter value={stats.summaries} /></h1>
           <button style={styles.button} onClick={() => navigate("/summary")}>
             Generate Summary
           </button>
@@ -127,11 +176,7 @@ const styles = {
     fontWeight: "800",
     color: "#a78bfa",
   },
-
-  /* 🔹 USER DROPDOWN STYLES */
-  userBox: {
-    position: "relative",
-  },
+  userBox: { position: "relative" },
   userTrigger: {
     display: "flex",
     gap: "8px",
@@ -159,16 +204,9 @@ const styles = {
     textAlign: "left",
     cursor: "pointer",
   },
-
-  header: {
-    padding: "40px",
-  },
-  title: {
-    fontSize: "36px",
-  },
-  subtitle: {
-    opacity: 0.7,
-  },
+  header: { padding: "40px" },
+  title: { fontSize: "36px" },
+  subtitle: { opacity: 0.7 },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",

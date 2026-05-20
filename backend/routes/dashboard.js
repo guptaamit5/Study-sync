@@ -8,7 +8,7 @@ const Summary = require("../models/Summary");
 
 router.get("/stats", auth, async (req, res) => {
   try {
-    // 🔥 today 00:00
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -29,7 +29,7 @@ router.get("/stats", auth, async (req, res) => {
     res.json({
       notes: notesCount,
       todos: pendingTodos,
-      summariesToday, // 👈 DAILY RESET COUNT
+      summariesToday, 
     });
   } catch (err) {
     console.error(err);

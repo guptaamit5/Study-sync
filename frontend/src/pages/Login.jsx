@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import "./Login.css";
 
 export default function Login() {
@@ -67,6 +68,44 @@ export default function Login() {
         <button type="submit" disabled={loading}>
           {loading ? "Signing in..." : "Sign In"}
         </button>
+
+        {/* GOOGLE LOGIN BUTTON */}
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const res = await fetch(
+                  "http://localhost:5000/api/auth/google-login",
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      token: credentialResponse.credential,
+                    }),
+                  }
+                );
+
+              const data = await res.json();
+
+if (data.requiresOtp) {
+  navigate("/verify-otp", { state: { email: data.email } });
+} else {
+  localStorage.setItem("token", data.token);
+  navigate("/dashboard");
+}
+              } catch {
+                alert("Google login failed");
+              }
+            }}
+            onError={() => alert("Google Login Failed")}
+          />
+        </div>
 
         <div className="login-footer">
           New here? <Link to="/register">Create an account</Link>

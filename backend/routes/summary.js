@@ -3,18 +3,44 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const Summary = require("../models/Summary");
 
-// CREATE SUMMARY
 router.post("/", auth, async (req, res) => {
-  const { content, title } = req.body;
-
-  if (!content || !title) {
-    return res.status(400).json({ error: "Content and title required" });
-  }
-
   try {
-    // MOCK AI SUMMARY
+    const { content, title } = req.body;
+
+    if (!content || !title) {
+      return res.status(400).json({ error: "Content and title required" });
+    }
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Summarize the following clearly and professionally:\n\n${content}`,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.candidates) {
+      console.error(data);
+      return res.status(500).json({ error: "AI failed" });
+    }
+
     const summaryText =
-      "AI Summary:\n\n" + content.slice(0, 200) + "...";
+      data.candidates[0].content.parts[0].text;
 
     const summary = new Summary({
       user: req.user.id,
@@ -25,9 +51,10 @@ router.post("/", auth, async (req, res) => {
     await summary.save();
 
     res.json({ summary: summaryText });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Summary failed" });
+    console.error("Gemini Error:", err);
+    res.status(500).json({ error: "AI Summary failed" });
   }
 });
 

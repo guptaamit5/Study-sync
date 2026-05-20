@@ -13,7 +13,7 @@ router.post('/', auth, async (req, res) => {
   } catch (err) { res.status(500).send('Server error'); }
 });
 
-// Get notes (with optional query: tag, search, pinned)
+// Get notes 
 router.get('/', auth, async (req, res) => {
   try {
     const { tag, q, pinned } = req.query;
@@ -54,7 +54,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 
-// Delete note (HARD FIX)
+// Delete note 
 router.delete('/:id', auth, async (req, res) => {
   try {
     const deletedNote = await Note.findOneAndDelete({

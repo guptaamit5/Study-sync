@@ -159,6 +159,20 @@
 
 
 
+.cancel-btn {
+  background: transparent;
+  border: none;
+  color: #b78cff;   /* same purple tone */
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  opacity: 0.8;
+}
+
+
 
 .modal-box {
   width: 420px;
@@ -230,6 +244,8 @@
   background: #7c3aed;
   border-radius: 10px;
 }
+
+
 .modal-actions {
   display: flex;
   gap: 12px;

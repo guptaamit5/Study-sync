@@ -9,6 +9,7 @@ import Summary from "./pages/Summary";
 
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import VerifyOtp from "./pages/VerifyOtp";
 
 export default function App() {
   return (
@@ -59,6 +60,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/verify-otp" element={<VerifyOtp />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/login" />} />

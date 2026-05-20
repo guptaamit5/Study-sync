@@ -23,6 +23,8 @@ app.use("/api/notes", require("./routes/notes"));
 app.use("/api/todos", require("./routes/todos"));
 app.use("/api/summary", require("./routes/summary"));
 app.use("/api/dashboard", require("./routes/dashboard"));
+app.use("/api/ai-todo", require("./routes/aiTodo"));
+app.use("/api/voice", require("./routes/voice"));
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/summary", summaryRoutes);
 
